@@ -11,12 +11,9 @@
   <body>
     <header>
       <div class="container">
-        <a href="{{ url_for('home') }}" class="Start Button"
-          >Click here to select a new song!</a
-        >
+        <a href="{{ url_for('home') }}" class="newsong">New Song Choice</a>
       </div>
     </header>
-
     {% block content %} {% endblock %}
   </body>
 </html>

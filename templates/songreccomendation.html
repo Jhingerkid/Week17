@@ -8,8 +8,10 @@
 
     <h1>Recommendations:</h1>
     {% for i, song in recSongs %}
-    <p>{{i+1}}. {{song['info']}}</p>
-    <img src="{{song['cover']}}" alt="No Album Cover Available" />
+    <div class="recbox">
+      <p>{{i+1}}. {{song['info']}}</p>
+      <img src="{{song['cover']}}" alt="No Album Cover Available" />
+    </div>
     {% endfor %} {% endblock %}
   </body>
 </html>

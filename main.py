@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 import json
 import requests
 
+
 def makeSearchRequest(inputSong):
     url = "https://shazam.p.rapidapi.com/search"
     querystring = {"term": inputSong,
@@ -27,6 +28,7 @@ def makeRecommendationRequest(selectedKey):
                               url, headers=headers, params=querystring).json())
     return recommendationResponse
 
+
 def makeSongList(data):
     count = 0
     songList = []
@@ -38,6 +40,7 @@ def makeSongList(data):
         count = count + 1
     return songList
 
+
 def makeSongKeys(data):
     keyCount = 0
     songKeys = []
@@ -47,39 +50,55 @@ def makeSongKeys(data):
         keyCount = keyCount + 1
     return songKeys
 
+
 def parseRecommendedSongs(recSongsRaw):
     recSongPicks = []
     for song in recSongsRaw:
         recSongTitle = song['title']
         recSongArtist = song['subtitle']
-        if 'images' in song:
+        if 'images' in song and 'coverart' in song['images']:
             recSongAlbumCover = song['images']['coverart']
         elif 'images' not in song:
             recSongAlbumCover = "No Album Cover"
         songEntry = recSongTitle + " by " + recSongArtist
-        item = {"info" : songEntry, "cover" : recSongAlbumCover}
+        item = {"info": songEntry, "cover": recSongAlbumCover}
         recSongPicks.append(item)
     return recSongPicks
 
+
 app = Flask(__name__)
+
 
 @app.route("/")
 def home():
     return render_template("home.html")
 
+
 @app.route("/SongRecommendation", methods=['POST'])
 def songrecommendations():
     selectedKey = request.form['songpick']
-    recSongsRaw = makeRecommendationRequest(selectedKey)['tracks']
+    if 'tracks' not in makeRecommendationRequest(selectedKey):
+        recSongsRaw = [{"title": "There were no recommendations for this song",
+                       "subtitle": "Get rekt nerd"}]
+    elif 'tracks' in makeRecommendationRequest(selectedKey):
+        recSongsRaw = makeRecommendationRequest(selectedKey)['tracks']
     recSongs = parseRecommendedSongs(recSongsRaw)
-    return render_template("songreccomendation.html", recSongs=enumerate(recSongs))
+    return render_template("songreccomendation.html",
+                           recSongs=enumerate(recSongs))
+
 
 @app.route("/SongSuggestion", methods=['POST'])
 def songsuggestions():
     inputSong = request.form['songname']
     songSearch = makeSongList(makeSearchRequest(inputSong)['tracks']['hits'])
-    songKeys = makeSongKeys(makeSearchRequest(inputSong)['tracks']['hits'])
-    return render_template("songsuggestion.html", songSearch=enumerate(songSearch), songKeys=songKeys)
-    
+    songKeys = makeSongKeys(
+        makeSearchRequest(inputSong)['tracks']['hits']
+    )
+    return render_template(
+        "songsuggestion.html", songSearch=enumerate(songSearch),
+        songKeys=songKeys
+    )
+
+
 if __name__ == "__main__":
     app.run(debug=True)

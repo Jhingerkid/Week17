@@ -7,17 +7,20 @@
     {% extends "template.html" %} {% block content %}
 
     <h1>Select which song you meant:</h1>
-    {% for i, song in songSearch %}
-    <p>{{i+1}}. {{song}}</p>
-    <form action="/SongRecommendation" method="POST">
-      <input
-        type="hidden"
-        value="{{songKeys[i]}}"
-        id="songpick"
-        name="songpick"
-      />
-      <input value="Find Recommended Songs" type="submit" />
-    </form>
-    {% endfor %} {% endblock %}
+    <div class="songrec">
+      {% for i, song in songSearch %}
+      <p>{{i+1}}. {{song}}</p>
+      <form action="/SongRecommendation" method="POST">
+        <input
+          type="hidden"
+          value="{{songKeys[i]}}"
+          id="songpick"
+          name="songpick"
+        />
+        <input value="Find Recommended Songs" type="submit" />
+      </form>
+      {% endfor %}
+    </div>
+    {% endblock %}
   </body>
 </html>
